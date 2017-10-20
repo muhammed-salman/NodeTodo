@@ -13,7 +13,7 @@ var UserSchema = new mongoose.Schema({
     unique: true,
     validate:{
     	validator: validator.isEmail,
-    	message: '{value} is not a valid email'
+    	message: '{VALUE} is not a valid email'
     }
   },
   password:{
@@ -43,7 +43,7 @@ UserSchema.methods.toJSON = function(){
 UserSchema.methods.generateAuthToken = function(){
 	var user=this;
 	var access='auth';
-	var token=jwt.sign({_id: user._id.toHexString(), access},'abc123').toString();
+	var token=jwt.sign({_id: user._id.toHexString(), access},process.env.JWT_SECRET).toString();
 	user.tokens.push({access, token});
 	return user.save().then(()=>{
 		return token;
@@ -66,7 +66,7 @@ UserSchema.statics.findByToken = function(token){
 	var decoded;
 
 	try{
-		decoded = jwt.verify(token,'abc123');
+		decoded = jwt.verify(token,process.env.JWT_SECRET);
 	} catch(e){
 		return Promise.reject();
 	}
@@ -101,7 +101,7 @@ UserSchema.pre('save', function(next){
 	var user = this;
 
 	if(user.isModified('password')){
-		var hash=bcrypt.genSalt(10,(err, salt)=>{
+		bcrypt.genSalt(10,(err, salt)=>{
 			bcrypt.hash(user.password, salt, (err, hash)=>{
 				user.password=hash;
 				next();

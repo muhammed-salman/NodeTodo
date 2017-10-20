@@ -27,9 +27,9 @@ describe('POST /todos',()=>{
       if(err){
         return done(err);
       }
-      Todo.find().then((todos)=>{
-        expect(todos.length).toBe(3);
-        expect(todos[2].text).toBe(text);
+      Todo.find({text}).then((todos)=>{
+        expect(todos.length).toBe(1);
+        expect(todos[0].text).toBe(text);
         done();
       }).catch((e) => done(e));
     });
@@ -255,7 +255,7 @@ describe('GET /users/me',()=>{
 describe('POST /users',() =>{
     
     it('should create a user', (done) => {
-      var email = 'example2@example.com';
+      var email = 'example@example.com';
       var password = '123mnb!';
 
       request(app)
